@@ -9,5 +9,11 @@ namespace NLog.Raygun
         {
 
         }
+
+        public RaygunException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+            
+        }
     }
 }

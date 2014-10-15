@@ -30,7 +30,7 @@ namespace NLog.Raygun
         {
             var logMessage = Layout.Render(logEvent);
 
-            var exception = new RaygunException(logMessage);
+            var exception = new RaygunException(logMessage, logEvent.Exception);
 
             var client = CreateRaygunClient();
 
