@@ -59,7 +59,7 @@ Your `NLog.config` should look something like this:
 
 ## Tags
 
-You can add tags per exception by putting a List<string> of tags into your Exception.Data array using the Tags key
+You can add tags per exception by putting a List<string> of tags into your Exception.Data array using the `Tags` key
 
 ```csharp
 var e = new Exception("Test Exception");
