@@ -1,14 +1,24 @@
 NLog.Raygun
 ===========
 
-A custom [NLog] target that will push errors to [Raygun].
+A custom [NLog] target that will push exceptions to [Raygun].
 
 [NLog]: http://nlog-project.org/
 [Raygun]: http://raygun.io/
 
 ## Configuration
 
-You need to configure NLog.
+You need to configure NLog.config.
+
+#### Settings
+
+* ApiKey - your API key
+* Tags - tags you want to send in with every exception
+* IgnoreFormFieldNames - form fields you wish to ignore, eg passwords and credit cards
+* IgnoreCookieNames - cookies you wish to ignore, eg user tokens
+* IgnoreServerVariableNames - Server vars you wish to ignore, eg sessions
+* IgnoreHeaderNames - HTTP header to ignore, eg API keys
+* UseIdentityNameAsUserId - If you're using a web project, send user name from HttpContext.Current.User.Identity.Name? Used for User Tracking
 
 ### NLog Configuration
 
@@ -26,14 +36,23 @@ Your `NLog.config` should look something like this:
   <targets>
     <!-- Set up the target -->
     <target name="asyncRaygun" xsi:type="AsyncWrapper">
-		<target name="RayGunTarget" type="RayGun" ApiKey="" Tags="" IgnoreFormFieldNames="" IgnoreCookieNames=""
-				IgnoreServerVariableNames="" IgnoreHeaderNames=""
-				layout="${uppercase:${level}} ${message} ${exception:format=ToString,StackTrace}${newline}"/>
-	</target>
+		  <target 
+        name="RayGunTarget" 
+        type="RayGun" 
+        ApiKey="" 
+        Tags="" 
+        IgnoreFormFieldNames="" 
+        IgnoreCookieNames=""
+				IgnoreServerVariableNames="" 
+        IgnoreHeaderNames=""
+        UseIdentityNameAsUserId="true"
+				layout="${uppercase:${level}} ${message} ${exception:format=ToString,StackTrace}${newline}"
+      />
+	 </target>
   </targets>
   <rules>
     <!-- Set up the logger. -->
-    <logger name="*" minlevel="Info" writeTo="RayGunTarget" />
+    <logger name="*" minlevel="Error" writeTo="RayGunTarget" />
   </rules>
 </nlog>
 ```
