@@ -26,7 +26,7 @@ namespace NLog.Raygun.WebTestApp.Controllers
 
     public ActionResult Error()
     {
-      throw new NullReferenceException("Tester");
+      throw new ArgumentOutOfRangeException("Test");
     }
   }
 }
