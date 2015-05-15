@@ -29,8 +29,8 @@ namespace NLog.Raygun
     [RequiredParameter]
     public string IgnoreHeaderNames { get; set; }
 
-    //[RequiredParameter]
-    //public bool UseIdentityNameAsUserId { get; set; }
+    [RequiredParameter]
+    public bool UseIdentityNameAsUserId { get; set; }
 
     protected override void Write(LogEventInfo logEvent)
     {
@@ -77,7 +77,7 @@ namespace NLog.Raygun
 
       RaygunClient raygunClient = CreateRaygunClient();
 
-      if (exceptionContext.HttpContext.Request.IsAuthenticated && true)
+      if (exceptionContext.HttpContext.Request.IsAuthenticated && UseIdentityNameAsUserId)
       {
         raygunClient.User = exceptionContext.HttpContext.User.Identity.Name;
       }
