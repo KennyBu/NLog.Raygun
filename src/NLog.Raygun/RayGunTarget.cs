@@ -175,9 +175,9 @@ namespace NLog.Raygun
           {
             type = type.BaseType;
           }
-          assembly = type?.Assembly;
+          assembly = type != null ? type.Assembly : null;
         }
-        return assembly?.GetName().Version.ToString();
+        return assembly != null ? assembly.GetName().Version.ToString() : null;
 
       }
       catch (Exception)
