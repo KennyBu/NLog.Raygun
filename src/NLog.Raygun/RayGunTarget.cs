@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Web.Mvc;
 using Mindscape.Raygun4Net;
 using NLog.Config;
@@ -31,6 +32,18 @@ namespace NLog.Raygun
 
     [RequiredParameter]
     public bool UseIdentityNameAsUserId { get; set; }
+
+    /// <summary>
+    /// Attempt to get the executing assembly version, or root ASP.Net assembly version for Raygun events.
+    /// </summary>
+    [RequiredParameter]
+    public bool UseExecutingAssemblyVersion { get; set; }
+
+    /// <summary>
+    /// Explicitly defines an application version for Raygun events. 
+    /// NOTE: This value will be ignored if UseExecutingAssemblyVersion is set to true and returns a value.
+    /// </summary>
+    public string ApplicationVersion { get; set; }
 
     protected override void Write(LogEventInfo logEvent)
     {
@@ -108,11 +121,20 @@ namespace NLog.Raygun
     {
       var client = new RaygunClient(ApiKey);
 
+      if (UseExecutingAssemblyVersion)
+      {
+        client.ApplicationVersion = GetExecutingAssemblyVersion();
+      }
+
+      if (string.IsNullOrEmpty(client.ApplicationVersion))
+      {
+        client.ApplicationVersion = ApplicationVersion;
+      }
+
       client.IgnoreFormFieldNames(SplitValues(IgnoreFormFieldNames));
       client.IgnoreCookieNames(SplitValues(IgnoreCookieNames));
       client.IgnoreHeaderNames(SplitValues(IgnoreHeaderNames));
       client.IgnoreServerVariableNames(SplitValues(IgnoreServerVariableNames));
-
       return client;
     }
 
@@ -139,6 +161,30 @@ namespace NLog.Raygun
       }
 
       return new[] { string.Empty };
+    }
+
+    private static string GetExecutingAssemblyVersion()
+    {
+      try
+      {
+        var assembly = Assembly.GetEntryAssembly();
+        if (assembly == null)
+        {
+          var type = System.Web.HttpContext.Current.ApplicationInstance.GetType();
+          while (type != null && type.Namespace == "ASP")
+          {
+            type = type.BaseType;
+          }
+          assembly = type != null ? type.Assembly : null;
+        }
+        return assembly != null ? assembly.GetName().Version.ToString() : null;
+
+      }
+      catch (Exception)
+      {
+        return null;
+      }
+
     }
   }
 }
