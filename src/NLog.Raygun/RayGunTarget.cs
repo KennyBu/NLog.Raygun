@@ -40,7 +40,7 @@ namespace NLog.Raygun
     public bool UseExecutingAssemblyVersion { get; set; }
 
     /// <summary>
-    /// Explicitly defines an application version for Raygun events. 
+    /// Explicitly defines an application version for Raygun events.
     /// NOTE: This value will be ignored if UseExecutingAssemblyVersion is set to true and returns a value.
     /// </summary>
     public string ApplicationVersion { get; set; }
@@ -113,6 +113,11 @@ namespace NLog.Raygun
         {
           tags.AddRange(((string[])exception.Data["Tags"]).ToList());
         }
+
+        if (exception.Data["Tags"].GetType() == typeof(string))
+        {
+          tags.AddRange(SplitValues((string)exception.Data["Tags"]));
+        }
       }
       return tags;
     }
@@ -153,7 +158,7 @@ namespace NLog.Raygun
       client.SendInBackground(exception, exceptionTags);
     }
 
-    private string[] SplitValues(string input)
+    private static string[] SplitValues(string input)
     {
       if (!string.IsNullOrWhiteSpace(input))
       {
