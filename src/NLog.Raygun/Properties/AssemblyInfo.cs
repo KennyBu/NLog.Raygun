@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("NLog.Raygun")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hewlett-Packard Company")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("NLog.Raygun")]
-[assembly: AssemblyCopyright("Copyright © Hewlett-Packard Company 2014")]
+[assembly: AssemblyCopyright("Copyright © 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

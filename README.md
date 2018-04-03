@@ -18,7 +18,8 @@ You need to configure NLog.config.
 * IgnoreCookieNames - cookies you wish to ignore, eg user tokens
 * IgnoreServerVariableNames - Server vars you wish to ignore, eg sessions
 * IgnoreHeaderNames - HTTP header to ignore, eg API keys
-* UseIdentityNameAsUserId - If you're using a web project, send user name from HttpContext.Current.User.Identity.Name? Used for User Tracking
+* IsRawDataIgnored - RawData from web requests is ignored
+* UserIdentityInfo - Explicitly defines lookup of user identity for Raygun events.
 * UseExecutingAssemblyVersion - Attempt to get the executing assembly version, or root ASP.Net assembly version for Raygun events.
 * ApplicationVersion - Explicitly defines an application version for Raygun events. This will be ignored if UseExecutingAssemblyVersion is set to true and returns a value.
     
@@ -36,23 +37,21 @@ Your `NLog.config` should look something like this:
     <add assembly="NLog.Raygun"/>
   </extensions>
   <targets>
-    <!-- Set up the target -->
-    <target name="asyncRaygun" xsi:type="AsyncWrapper">
-		  <target 
-        name="RayGunTarget" 
-        type="RayGun" 
-        ApiKey="" 
-        Tags="" 
-        IgnoreFormFieldNames="" 
-        IgnoreCookieNames=""
-				IgnoreServerVariableNames="" 
-        IgnoreHeaderNames=""
-        UseIdentityNameAsUserId="true"
-        UseExecutingAssemblyVersion="false"
-        ApplicationVersion=""
-				layout="${uppercase:${level}} ${message} ${exception:format=ToString,StackTrace}${newline}"
+    <!-- Set up the target (Avoid using async=true or AsyncWrapper) -->
+	<target 
+		name="RayGunTarget" 
+		type="RayGun" 
+		ApiKey="" 
+		Tags="" 
+		IgnoreFormFieldNames="" 
+		IgnoreCookieNames="" 
+		IgnoreServerVariableNames="" 
+		IgnoreHeaderNames="" 
+		UserIdentityInfo="" 
+		UseExecutingAssemblyVersion="false" 
+		ApplicationVersion="" 
+		layout="${uppercase:${level}} ${message} ${exception:format=ToString,StackTrace}${newline}"
       />
-	 </target>
   </targets>
   <rules>
     <!-- Set up the logger. -->
