@@ -6,7 +6,7 @@
     <Version>1.0.0</Version>
     <Title>NLog.Raygun</Title>
     <Product>NLog.Raygun</Product>
-    <Company>MindscapeHQ</Company>
+    <Company>Raygun</Company>
     <Authors>Ken Burkhardt</Authors>
     <Description>A custom NLog target that will push exceptions to Raygun</Description>
     <Copyright>Copyright © 2015</Copyright>
@@ -18,8 +18,8 @@
     <RepositoryUrl>git://github.com/MindscapeHQ/NLog.Raygun</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="NLog" Version="3.2.1" />
-    <PackageReference Include="Mindscape.Raygun4Net" Version="5.0.1" />
+    <PackageReference Include="NLog" Version="4.0.0" />
+    <PackageReference Include="Mindscape.Raygun4Net" Version="5.5.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' != 'net45' ">
     <PackageReference Include="NLog" Version="4.5.0" />
