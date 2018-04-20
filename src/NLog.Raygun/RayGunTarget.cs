@@ -11,7 +11,21 @@ namespace NLog.Raygun
   public class RayGunTarget : TargetWithLayout
   {
     [RequiredParameter]
-    public string ApiKey { get; set; }
+    public string ApiKey
+    {
+      get
+      {
+        SimpleLayout simpleLayout = _apiKey as SimpleLayout;
+        if (simpleLayout != null)
+          return simpleLayout.Text;
+        else if (_apiKey != null)
+          return _apiKey.ToString();
+        else
+          return null;
+      }
+      set { _apiKey = value; }
+    }
+    private Layout _apiKey;
 
     public string Tags { get; set; }
 
@@ -110,9 +124,13 @@ namespace NLog.Raygun
         exception = new RaygunException(layoutLogMessage);
       }
 
+#if NET45
       string userIdentityInfo = UserIdentityInfo != null ? UserIdentityInfo.Render(logEvent) : string.Empty;
       var userIdentity = string.IsNullOrEmpty(userIdentityInfo) ? null : new Mindscape.Raygun4Net.Messages.RaygunIdentifierMessage(userIdentityInfo);
       _raygunClient.SendInBackground(exception, tags, userCustomData, userIdentity);
+#else
+      _raygunClient.SendInBackground(exception, tags, userCustomData);
+#endif
     }
 
     private static Exception ExtractException(LogEventInfo logEvent)
@@ -145,7 +163,7 @@ namespace NLog.Raygun
             continue;
 
           object propertyValue = property.Value;
-          if (propertyValue == null || Convert.GetTypeCode(propertyValue) != TypeCode.Object || propertyValue is decimal)
+          if (propertyValue == null || Convert.GetTypeCode(propertyValue) != TypeCode.Object)
             properties[propertyKey] = propertyValue;
           else
             properties[propertyKey] = propertyValue.ToString();
@@ -198,7 +216,20 @@ namespace NLog.Raygun
 
     private RaygunClient CreateRaygunClient()
     {
-      var client = string.IsNullOrEmpty(ApiKey) ? new RaygunClient() : new RaygunClient(ApiKey);
+      RaygunClient client = null;
+      string apiKey = _apiKey?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+      if (!string.IsNullOrEmpty(apiKey))
+      {
+        client = new RaygunClient(apiKey);
+      }
+      else
+      {
+#if NET45
+        client = new RaygunClient();
+#else
+        throw new ArgumentException("NLog RaygunTarget requires valid ApiKey property", nameof(ApiKey));
+#endif
+      }
 
       if (UseExecutingAssemblyVersion)
       {
