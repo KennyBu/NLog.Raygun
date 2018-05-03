@@ -7,9 +7,9 @@
     <Title>NLog.Raygun</Title>
     <Product>NLog.Raygun</Product>
     <Company>Raygun</Company>
-    <Authors>Ken Burkhardt</Authors>
+    <Authors>Ken Burkhardt, Raygun</Authors>
     <Description>A custom NLog target that will push exceptions to Raygun</Description>
-    <Copyright>Copyright © 2015</Copyright>
+    <Copyright>Copyright © Raygun 2015-2018</Copyright>
 
     <PackageTags>NLog;Raygun;Log;Logging</PackageTags>
     <PackageProjectUrl>https://github.com/MindscapeHQ/NLog.Raygun</PackageProjectUrl>
