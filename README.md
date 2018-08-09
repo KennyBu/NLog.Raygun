@@ -12,15 +12,15 @@ You need to configure NLog.config.
 
 #### Settings
 
-* ApiKey - your API key
-* Tags - tags you want to send in with every exception
-* IgnoreFormFieldNames - form fields you wish to ignore, eg passwords and credit cards
-* IgnoreCookieNames - cookies you wish to ignore, eg user tokens
-* IgnoreServerVariableNames - Server vars you wish to ignore, eg sessions
-* IgnoreHeaderNames - HTTP header to ignore, eg API keys
-* IsRawDataIgnored - RawData from web requests is ignored
+* ApiKey - Your API key.
+* Tags - Tags you want to send in with every exception.
+* IgnoreFormFieldNames - Form fields you wish to ignore, eg passwords and credit cards.
+* IgnoreCookieNames - Cookies you wish to ignore, eg user tokens.
+* IgnoreServerVariableNames - Server variables you wish to ignore, eg sessions.
+* IgnoreHeaderNames - HTTP headers to ignore, eg API keys.
+* IsRawDataIgnored - RawData from web requests is ignored. Default is ```false```.
 * UserIdentityInfo - Explicitly defines lookup of user identity for Raygun events.
-* UseExecutingAssemblyVersion - Attempt to get the executing assembly version, or root ASP.Net assembly version for Raygun events.
+* UseExecutingAssemblyVersion - Attempt to get the executing assembly version, or root ASP.Net assembly version for Raygun events. Default is ```false```.
 * ApplicationVersion - Explicitly defines an application version for Raygun events. This will be ignored if UseExecutingAssemblyVersion is set to true and returns a value.
     
 ### NLog Configuration
