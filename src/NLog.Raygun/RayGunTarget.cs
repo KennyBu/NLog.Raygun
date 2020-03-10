@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mindscape.Raygun4Net;
+#if !NET45
+using Mindscape.Raygun4Net.AspNetCore;
+#endif
+using NLog.Common;
 using NLog.Config;
 using NLog.Layouts;
 using NLog.Targets;
@@ -108,29 +112,47 @@ namespace NLog.Raygun
       _raygunClient = null;
     }
 
-    protected override void Write(LogEventInfo logEvent)
+    protected override void Write(AsyncLogEventInfo logEvent)
     {
-      _raygunClient = _raygunClient ?? (_raygunClient = CreateRaygunClient());
-
-      Exception exception = ExtractException(logEvent);
-      var tags = ExtractTags(logEvent, exception);
-      Dictionary<string, object> userCustomData = ExtractProperties(logEvent);
-      string layoutLogMessage = Layout.Render(logEvent);
-      userCustomData["RenderedLogMessage"] = layoutLogMessage;
-      userCustomData["LogMessageTemplate"] = logEvent.Message;
-
-      if (exception == null)
+      try
       {
-        exception = new RaygunException(layoutLogMessage);
-      }
+        _raygunClient = _raygunClient ?? (_raygunClient = CreateRaygunClient());
+
+        Exception exception = ExtractException(logEvent.LogEvent);
+        var tags = ExtractTags(logEvent.LogEvent, exception);
+        Dictionary<string, object> userCustomData = ExtractProperties(logEvent.LogEvent);
+        string layoutLogMessage = Layout.Render(logEvent.LogEvent);
+        userCustomData["RenderedLogMessage"] = layoutLogMessage;
+        userCustomData["LogMessageTemplate"] = logEvent.LogEvent.Message;
+
+        if (exception == null)
+        {
+          exception = new RaygunException(layoutLogMessage);
+        }
 
 #if NET45
-      string userIdentityInfo = UserIdentityInfo != null ? UserIdentityInfo.Render(logEvent) : string.Empty;
-      var userIdentity = string.IsNullOrEmpty(userIdentityInfo) ? null : new Mindscape.Raygun4Net.Messages.RaygunIdentifierMessage(userIdentityInfo);
-      _raygunClient.SendInBackground(exception, tags, userCustomData, userIdentity);
+        string userIdentityInfo = UserIdentityInfo != null ? UserIdentityInfo.Render(logEvent.LogEvent) : string.Empty;
+        var userIdentity = string.IsNullOrEmpty(userIdentityInfo) ? null : new Mindscape.Raygun4Net.Messages.RaygunIdentifierMessage(userIdentityInfo);
+        _raygunClient.SendInBackground(exception, tags, userCustomData, userIdentity);
+        logEvent.Continuation(null);
 #else
-      _raygunClient.SendInBackground(exception, tags, userCustomData);
+        _raygunClient.SendInBackground(exception, tags, userCustomData).ContinueWith((t,s) => SendCompleted(t.Exception, (AsyncContinuation)s), logEvent.Continuation);
 #endif
+      }
+      catch (Exception ex)
+      {
+        InternalLogger.Error(ex, "RayGun(Name={0}): Failed to send logevent.", Name);
+        logEvent.Continuation(ex);
+      }
+    }
+
+    private static void SendCompleted(Exception taskException, AsyncContinuation continuation)
+    {
+      if (taskException != null)
+      {
+        InternalLogger.Error(taskException, "RayGun: Failed sending logevent.");
+      }
+      continuation(taskException);
     }
 
     private static Exception ExtractException(LogEventInfo logEvent)
@@ -151,7 +173,7 @@ namespace NLog.Raygun
     private static Dictionary<string, object> ExtractProperties(LogEventInfo logEvent)
     {
       Dictionary<string, object> properties = new Dictionary<string, object>();
-      if (logEvent.Properties.Count > 0)
+      if (logEvent.HasProperties)
       {
         foreach (var property in logEvent.Properties)
         {

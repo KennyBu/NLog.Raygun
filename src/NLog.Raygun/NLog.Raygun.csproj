@@ -17,12 +17,13 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/MindscapeHQ/NLog.Raygun</RepositoryUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="4.5.11" />
+  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="NLog" Version="4.0.0" />
-    <PackageReference Include="Mindscape.Raygun4Net" Version="5.5.0" />
+    <PackageReference Include="Mindscape.Raygun4Net" Version="5.7.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' != 'net45' ">
-    <PackageReference Include="NLog" Version="4.5.0" />
-    <PackageReference Include="Mindscape.Raygun4Net.AspNetCore" Version="5.5.0" />
+    <PackageReference Include="Mindscape.Raygun4Net.AspNetCore" Version="6.1.0" />
   </ItemGroup>
 </Project>
